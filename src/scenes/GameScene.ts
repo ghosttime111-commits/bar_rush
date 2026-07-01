@@ -32,6 +32,7 @@ import { installResponsiveLayout } from '../ui/LayoutManager'
 import { FullscreenControl } from '../ui/FullscreenControl'
 
 type Customer = {
+  slotId: CustomerSlotId
   card: CustomerCard
   recipe: Recipe
   type: CustomerType
@@ -42,6 +43,8 @@ type Customer = {
 
 const CUSTOMER_X = [235, 480, 725]
 const CUSTOMER_Y = 184
+const CUSTOMER_SLOT_IDS = ['slot-0', 'slot-1', 'slot-2'] as const
+type CustomerSlotId = typeof CUSTOMER_SLOT_IDS[number]
 
 export class GameScene extends Phaser.Scene {
   private money = 0
@@ -57,6 +60,7 @@ export class GameScene extends Phaser.Scene {
   private maxCombo = 0
   private progress!: PlayerProgress
   private customers: Customer[] = []
+  private customerSlots = new Map<CustomerSlotId, Customer>()
   private selectedCustomer = 0
   private drinkState: DrinkState = emptyDrinkState()
   private ingredientButtons = new Map<Ingredient, IngredientButton>()
@@ -81,9 +85,11 @@ export class GameScene extends Phaser.Scene {
   private insuranceUses = 0
   private inputLocked = false
   private cleanedUp = false
+  private patienceDevRunning = false
   private mode: ShiftModeDefinition = getShiftMode('normal')
   private readonly hiddenHandler = (): void => this.pauseForHiddenTab()
   private readonly visibleHandler = (): void => this.showResumeAfterHiddenTab()
+  private readonly patienceDevKeyHandler = (): void => { void this.runPatienceDevCheck() }
 
   constructor() { super('GameScene') }
 
@@ -137,15 +143,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number): void {
-    if (this.ended || this.overlayOpen || this.tabPaused) return
+    if (this.ended || this.overlayOpen || this.tabPaused || this.patienceDevRunning) return
     const patienceDrain = Math.max(0, 1 - this.progress.upgrades.quickHands * 0.1) * this.mode.patienceDrainMultiplier
-    for (let index = 0; index < this.customers.length; index += 1) {
-      const customer = this.customers[index]!
+    for (const customer of this.customerSlots.values()) {
       if (customer.busy) continue
       customer.patience -= (delta / 1000) * patienceDrain
-      const ratio = Phaser.Math.Clamp(customer.patience / customer.patienceMax, 0, 1)
-      customer.card.setPatience(ratio)
-      if (customer.patience <= 0) this.loseCustomer(index)
+      this.updateCustomerPatience(customer)
+      if (customer.patience <= 0) this.loseCustomer(customer.slotId)
     }
   }
 
@@ -164,6 +168,7 @@ export class GameScene extends Phaser.Scene {
     this.combo = 0
     this.maxCombo = 0
     this.customers = []
+    this.customerSlots.clear()
     this.selectedCustomer = 0
     this.drinkState = emptyDrinkState()
     this.ingredientButtons.clear()
@@ -185,13 +190,16 @@ export class GameScene extends Phaser.Scene {
     this.overlayOpen = false
     this.tabPaused = false
     this.resumeModalOpen = false
+    this.patienceDevRunning = false
   }
 
   private createCustomers(): void {
     const sprites = pickCustomerSprites(CUSTOMER_X.length)
     CUSTOMER_X.forEach((x, index) => {
-      const card = new CustomerCard(this, x, CUSTOMER_Y, sprites[index]!, () => this.selectCustomer(index))
+      const slotId = CUSTOMER_SLOT_IDS[index]!
+      const card = new CustomerCard(this, x, CUSTOMER_Y, slotId, sprites[index]!, () => this.selectCustomer(index))
       const customer: Customer = {
+        slotId,
         card,
         recipe: this.availableRecipes[0]!,
         type: weightedCustomerType(this.mode.customerTypeWeights, this.progress.upgrades.advertising, this.progress.upgrades.neonSign),
@@ -200,6 +208,7 @@ export class GameScene extends Phaser.Scene {
         busy: false,
       }
       this.customers.push(customer)
+      this.customerSlots.set(slotId, customer)
       card.setVip(this.mode.id === 'vipNight')
     })
   }
@@ -333,7 +342,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private selectCustomer(index: number): void {
-    if (!this.isSceneUsable()) return
+    if (!this.isSceneUsable() || index < 0 || index >= this.customers.length) return
     this.selectedCustomer = index
     this.refreshSelection()
     this.customers[index]!.card.pulseSelection()
@@ -449,8 +458,11 @@ export class GameScene extends Phaser.Scene {
     })
   }
 
-  private loseCustomer(index: number): void {
-    const customer = this.customers[index]!
+  private loseCustomer(slotId: CustomerSlotId): void {
+    const customer = this.customerSlots.get(slotId)
+    if (!customer) return
+    const index = CUSTOMER_SLOT_IDS.indexOf(slotId)
+    if (index < 0) return
     if (customer.busy) return
     customer.busy = true
     if (this.insuranceUses > 0) this.insuranceUses -= 1
@@ -485,8 +497,87 @@ export class GameScene extends Phaser.Scene {
     customer.patienceMax = Phaser.Math.Between(25, 37) * customer.type.patienceMultiplier
     customer.patience = customer.patienceMax
     customer.card.setOrder(customer.recipe, customer.type)
-    customer.card.setPatience(1)
+    this.updateCustomerPatience(customer)
     if (this.customers[this.selectedCustomer] === customer) this.syncDrinkBuilder()
+  }
+
+  private updateCustomerPatience(customer: Customer): void {
+    const ratio = customer.patienceMax > 0
+      ? Phaser.Math.Clamp(customer.patience / customer.patienceMax, 0, 1)
+      : 0
+    customer.card.setPatience(ratio)
+  }
+
+  private async runPatienceDevCheck(): Promise<void> {
+    if (!import.meta.env.DEV || this.patienceDevRunning || this.ended) return
+    this.patienceDevRunning = true
+    this.game.canvas.dataset.patienceDevCheck = 'RUNNING'
+    const originalPatience = new Map(
+      CUSTOMER_SLOT_IDS.map((slotId) => [slotId, this.customerSlots.get(slotId)?.patience ?? 0]),
+    )
+    try {
+      const { runPatienceDevCheck } = await import('../game/patienceDevCheck')
+      const targets = CUSTOMER_SLOT_IDS.map((slotId) => {
+        const customer = this.customerSlots.get(slotId)!
+        return {
+          slotId,
+          setRatio: (ratio: number): void => {
+            customer.patience = customer.patienceMax * Phaser.Math.Clamp(ratio, 0, 1)
+            this.updateCustomerPatience(customer)
+          },
+          read: () => customer.card.getPatienceVisualState(),
+        }
+      })
+      runPatienceDevCheck(this, targets, ({ passed, snapshots }) => {
+        if (!this.isSceneUsable()) return
+        this.game.canvas.dataset.patienceDevCheck = JSON.stringify({ passed, replacementPending: true, snapshots })
+        this.showMessage(
+          passed ? 'DEV F6 · терпение slot-0/1/2: OK' : 'DEV F6 · ошибка ширины терпения',
+          passed ? '#82efa1' : '#ff7883',
+        )
+        this.time.delayedCall(700, () => {
+          if (!this.isSceneUsable()) return
+          CUSTOMER_SLOT_IDS.slice(1).forEach((slotId) => {
+            const customer = this.customerSlots.get(slotId)
+            if (!customer) return
+            customer.patience = originalPatience.get(slotId) ?? customer.patienceMax
+            this.updateCustomerPatience(customer)
+          })
+          const firstSlot = this.customerSlots.get('slot-0')
+          if (!firstSlot) {
+            this.patienceDevRunning = false
+            return
+          }
+          const originalCard = firstSlot.card
+          firstSlot.patience = 0
+          this.updateCustomerPatience(firstSlot)
+          this.patienceDevRunning = false
+          this.time.delayedCall(1250, () => {
+            if (!this.isSceneUsable()) return
+            const replacement = this.customerSlots.get('slot-0')
+            const visual = replacement?.card.getPatienceVisualState()
+            const replacementPassed = replacement?.card === originalCard
+              && replacement.busy === false
+              && (visual?.ratio ?? 0) > 0.94
+              && visual?.slotId === 'slot-0'
+            this.game.canvas.dataset.patienceDevCheck = JSON.stringify({
+              passed: passed && replacementPassed,
+              replacementPassed,
+              replacementRatio: visual?.ratio ?? null,
+              snapshots,
+            })
+            this.showMessage(
+              replacementPassed ? 'DEV F6 · новый клиент slot-0: OK' : 'DEV F6 · slot-0 не перепривязан',
+              replacementPassed ? '#82efa1' : '#ff7883',
+            )
+          })
+        })
+      })
+    } catch (error) {
+      this.patienceDevRunning = false
+      this.game.canvas.dataset.patienceDevCheck = 'ERROR'
+      console.error('[Bar Rush] Patience dev check failed to start.', error)
+    }
   }
 
   private refreshAll(): void {
@@ -604,6 +695,7 @@ export class GameScene extends Phaser.Scene {
   private registerLifecycle(): void {
     window.addEventListener('bar-rush-hidden', this.hiddenHandler)
     window.addEventListener('bar-rush-visible', this.visibleHandler)
+    if (import.meta.env.DEV) this.input.keyboard?.on('keydown-F6', this.patienceDevKeyHandler)
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup, this)
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup, this)
   }
@@ -619,6 +711,8 @@ export class GameScene extends Phaser.Scene {
     this.cleanedUp = true
     window.removeEventListener('bar-rush-hidden', this.hiddenHandler)
     window.removeEventListener('bar-rush-visible', this.visibleHandler)
+    this.input.keyboard?.off('keydown-F6', this.patienceDevKeyHandler)
+    delete this.game.canvas.dataset.patienceDevCheck
     this.shiftEvent?.remove(false)
     this.shiftEvent = undefined
     this.time.removeAllEvents()
@@ -635,6 +729,7 @@ export class GameScene extends Phaser.Scene {
     this.ingredientButtons.clear()
     this.ingredientNavObjects = []
     this.customers = []
+    this.customerSlots.clear()
     this.clearComponentReferences()
   }
 

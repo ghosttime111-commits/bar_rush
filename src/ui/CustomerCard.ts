@@ -7,7 +7,18 @@ import { audioManager } from '../audio/AudioManager'
 import { BODY_FONT, CYBER, CYBER_FONT, hex, UI_STROKE } from './cyberTheme'
 import { createCocktailIcon } from './CocktailIcon'
 
+const PATIENCE_FILL_WIDTH = 176
+
+export type PatienceVisualState = {
+  slotId: string
+  ratio: number
+  fullWidth: number
+  fillWidth: number
+  glowWidth: number
+}
+
 export class CustomerCard {
+  readonly slotId: string
   private scene: Phaser.Scene
   readonly root: Phaser.GameObjects.Container
   private frame: Phaser.GameObjects.Rectangle
@@ -27,6 +38,7 @@ export class CustomerCard {
   private spriteDisplay: Pick<CustomerSpriteDefinition, 'scaleMultiplier' | 'offsetX' | 'offsetY'>
   private selected = false
   private lowPatience = false
+  private patienceRatio = 1
   private vip = false
   private destroyed = false
 
@@ -34,10 +46,12 @@ export class CustomerCard {
     scene: Phaser.Scene,
     x: number,
     y: number,
+    slotId: string,
     sprite: CustomerSpriteDefinition,
     onSelect: () => void,
   ) {
     this.scene = scene
+    this.slotId = slotId
     this.spriteKey = sprite.key
     this.look = sprite.archetype
     this.spriteDisplay = sprite
@@ -75,9 +89,9 @@ export class CustomerCard {
     const patienceBg = scene.add.rectangle(0, 111, 184, 16, 0x060817, 0.94)
       .setStrokeStyle(1, CYBER.cyanSoft, UI_STROKE.normal)
     const patienceTrack = scene.add.rectangle(0, 111, 176, 10, CYBER.panelBright, 0.95)
-    this.patienceGlow = scene.add.rectangle(-88, 111, 176, 10, CYBER.danger, 0)
+    this.patienceGlow = scene.add.rectangle(-88, 111, PATIENCE_FILL_WIDTH, 10, CYBER.danger, 0)
       .setOrigin(0, 0.5)
-    this.patienceBar = scene.add.rectangle(-88, 111, 176, 10, CYBER.success)
+    this.patienceBar = scene.add.rectangle(-88, 111, PATIENCE_FILL_WIDTH, 10, CYBER.success)
       .setOrigin(0, 0.5)
     const patienceTicks = scene.add.graphics()
     patienceTicks.lineStyle(1, CYBER.void, 0.72)
@@ -159,11 +173,14 @@ export class CustomerCard {
 
   setPatience(ratio: number): void {
     if (!this.isUsable()) return
-    this.patienceBar.setScale(ratio, 1)
-    const color = patienceColor(ratio)
+    const clampedRatio = Phaser.Math.Clamp(Number.isFinite(ratio) ? ratio : 0, 0, 1)
+    this.patienceRatio = clampedRatio
+    this.patienceBar.setScale(clampedRatio, 1)
+    this.patienceGlow.setScale(clampedRatio, 1)
+    const color = patienceColor(clampedRatio)
     this.patienceBar.setFillStyle(color)
     this.patienceGlow.setFillStyle(color)
-    const nowLow = ratio <= 0.25
+    const nowLow = clampedRatio <= 0.25
     if (nowLow !== this.lowPatience) {
       this.lowPatience = nowLow
       this.scene.tweens.killTweensOf([this.patienceBar, this.patienceGlow, this.patienceWarning])
@@ -189,6 +206,16 @@ export class CustomerCard {
           ease: 'Sine.easeInOut',
         })
       }
+    }
+  }
+
+  getPatienceVisualState(): PatienceVisualState {
+    return {
+      slotId: this.slotId,
+      ratio: this.patienceRatio,
+      fullWidth: PATIENCE_FILL_WIDTH,
+      fillWidth: PATIENCE_FILL_WIDTH * this.patienceBar.scaleX,
+      glowWidth: PATIENCE_FILL_WIDTH * this.patienceGlow.scaleX,
     }
   }
 
