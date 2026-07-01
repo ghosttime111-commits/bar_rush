@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import { CYBER, CYBER_FONT, hex } from './cyberTheme'
+import { renderDensity } from './responsive'
 
 export const DESIGN_WIDTH = 960
 export const DESIGN_HEIGHT = 540
@@ -67,6 +68,11 @@ export function installResponsiveLayout(scene: Phaser.Scene): () => void {
     color: hex(CYBER.white),
     align: 'center',
   }).setOrigin(0.5).setDepth(9002).setVisible(false)
+  const sharpenText = (gameObject: Phaser.GameObjects.GameObject): void => {
+    if (gameObject instanceof Phaser.GameObjects.Text) gameObject.setResolution(renderDensity())
+  }
+  scene.children.list.forEach(sharpenText)
+  scene.sys.displayList.events.on(Phaser.Scenes.Events.ADDED_TO_SCENE, sharpenText)
 
   const apply = (): void => {
     if (destroyed || !scene.cameras.main) return
@@ -94,6 +100,7 @@ export function installResponsiveLayout(scene: Phaser.Scene): () => void {
     scene.scale.off(Phaser.Scale.Events.RESIZE, apply)
     window.removeEventListener('orientationchange', onOrientationChange)
     window.visualViewport?.removeEventListener('resize', apply)
+    scene.sys.displayList.events.off(Phaser.Scenes.Events.ADDED_TO_SCENE, sharpenText)
   }
   scene.events.once(Phaser.Scenes.Events.SHUTDOWN, cleanup)
   scene.events.once(Phaser.Scenes.Events.DESTROY, cleanup)

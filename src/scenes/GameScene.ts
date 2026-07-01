@@ -104,7 +104,7 @@ export class GameScene extends Phaser.Scene {
     this.hud = new HudBar(this)
     if (this.mode.id !== 'normal') this.modeBadge = new ShiftModeBadge(this, this.mode)
     this.createRecipeButton()
-    new FullscreenControl(this, { x: 891, y: 20, compact: true })
+    new FullscreenControl(this, { x: 891, y: 20, mobileX: 905, mobileY: 58, compact: true })
     this.createCustomers()
     this.createIngredientButtons()
     this.drinkBuilder = new DrinkBuilder(
@@ -231,22 +231,22 @@ export class GameScene extends Phaser.Scene {
     })
     const mobile = isMobileViewport()
     const portrait = mobile && window.innerHeight > window.innerWidth
-    const pageSize = portrait ? 6 : mobile ? 6 : 8
+    const pageSize = portrait ? 6 : mobile ? 4 : 8
     const categoryIngredients = this.availableIngredients.filter((ingredient) => ingredientDefinition(ingredient).category === this.ingredientCategory)
     const ingredients = categoryIngredients.slice(this.ingredientPage * pageSize, (this.ingredientPage + 1) * pageSize)
     ingredients.forEach((ingredient, index) => {
-      const columns = portrait ? 3 : mobile ? 6 : 8
+      const columns = portrait ? 3 : mobile ? 4 : 8
       const column = index % columns
       const row = Math.floor(index / columns)
       const rowCount = Math.min(columns, ingredients.length - row * columns)
-      const spacing = portrait ? 300 : mobile ? 112 : 112
+      const spacing = portrait ? 300 : mobile ? 178 : 112
       const rowWidth = (rowCount - 1) * spacing
       const x = portrait
         ? 180 + column * spacing
         : 480 - rowWidth / 2 + column * spacing
-      const y = portrait ? 349 + row * 42 : 360 + row * 47
-      const width = portrait ? 276 : mobile ? 102 : 102
-      const height = portrait ? 34 : mobile ? 45 : 52
+      const y = portrait ? 350 + row * 64 : mobile ? 366 + row * 66 : 360 + row * 47
+      const width = portrait ? 276 : mobile ? 164 : 102
+      const height = portrait ? 58 : mobile ? 62 : 52
       const button = new IngredientButton(this, x, y, width, height, ingredient, (picked, buttonX, buttonY) => {
         this.addIngredient(picked, buttonX, buttonY)
       })

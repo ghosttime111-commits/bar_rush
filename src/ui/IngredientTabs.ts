@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 import type { Ingredient, IngredientCategory } from '../game/ingredients'
 import { ingredientDefinition } from '../game/ingredients'
 import { CYBER, CYBER_FONT, hex } from './cyberTheme'
+import { isMobileViewport } from './responsive'
 
 const TABS: Array<{ id: IngredientCategory; label: string }> = [
   { id: 'alcohol', label: 'АЛКОГОЛЬ' },
@@ -19,10 +20,11 @@ export class IngredientTabs {
     active: IngredientCategory,
     onSelect: (category: IngredientCategory) => void,
   ) {
+    const mobile = isMobileViewport()
     TABS.forEach((tab, index) => {
       const count = ingredients.filter((ingredient) => ingredientDefinition(ingredient).category === tab.id).length
       const x = 286 + index * 194
-      const background = scene.add.rectangle(x, 318, 180, 25, tab.id === active ? CYBER.cyan : CYBER.panel, tab.id === active ? 0.92 : 0.68)
+      const background = scene.add.rectangle(x, 318, 180, mobile ? 30 : 25, tab.id === active ? CYBER.cyan : CYBER.panel, tab.id === active ? 0.92 : 0.68)
         .setStrokeStyle(1, tab.id === active ? CYBER.white : CYBER.cyanSoft, 0.7)
         .setInteractive({ useHandCursor: true }).setDepth(45)
       const label = scene.add.text(x, 318, `${tab.label}  ${count}`, {

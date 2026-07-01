@@ -8,6 +8,7 @@ import { audioManager } from '../audio/AudioManager'
 import { createIngredientIcon } from './IngredientIcon'
 import { Shaker } from './Shaker'
 import { CYBER, CYBER_FONT, hex } from './cyberTheme'
+import { isMobileViewport } from './responsive'
 
 const FONT = CYBER_FONT
 
@@ -37,8 +38,9 @@ export class DrinkBuilder {
     this.onServe = onServe
     this.onShake = onShake
     this.root = scene.add.container(0, 0)
-    const panel = scene.add.rectangle(480, 495, 914, 72, CYBER.panel, 0.76).setStrokeStyle(1, CYBER.cyan, 0.58)
-    const topLine = scene.add.rectangle(480, 460, 860, 2, CYBER.magenta, 0.6)
+    const mobile = isMobileViewport()
+    const panel = scene.add.rectangle(480, 495, 914, mobile ? 88 : 72, CYBER.panel, 0.76).setStrokeStyle(1, CYBER.cyan, 0.58)
+    const topLine = scene.add.rectangle(480, mobile ? 452 : 460, 860, 2, CYBER.magenta, 0.6)
 
     this.glass = scene.add.graphics().setDepth(12)
     this.drawGlass(105, 495, CYBER.cyan)
@@ -46,7 +48,7 @@ export class DrinkBuilder {
     this.shaker.root.setVisible(false)
     this.statusText = scene.add.text(164, 475, 'СБОРКА:// ПУСТО', { fontFamily: FONT, fontSize: '11px', color: hex(CYBER.muted) })
 
-    this.clearButton = scene.add.circle(370, 496, 19, CYBER.panelBright).setStrokeStyle(1, CYBER.magenta, 0.6)
+    this.clearButton = scene.add.circle(370, 496, mobile ? 23 : 19, CYBER.panelBright).setStrokeStyle(1, CYBER.magenta, 0.6)
       .setInteractive({ useHandCursor: true })
     const clearLabel = scene.add.text(370, 496, 'СБРОС', { fontFamily: FONT, fontSize: '8px', color: hex(CYBER.white) }).setOrigin(0.5)
     this.clearButton.on('pointerdown', () => {
@@ -54,9 +56,9 @@ export class DrinkBuilder {
       audioManager.notify('glassCleared'); this.onClear()
     })
 
-    this.shakeButton = scene.add.rectangle(535, 496, 250, 50, CYBER.panelBright).setStrokeStyle(1, CYBER.cyanSoft, 0.5)
+    this.shakeButton = scene.add.rectangle(535, 496, 250, mobile ? 60 : 50, CYBER.panelBright).setStrokeStyle(1, CYBER.cyanSoft, 0.5)
     this.shakeLabel = scene.add.text(535, 496, '[ ВЗБОЛТАТЬ ]', { fontFamily: FONT, fontSize: '14px', fontStyle: 'bold', color: hex(CYBER.muted) }).setOrigin(0.5)
-    this.serveButton = scene.add.rectangle(790, 496, 240, 50, CYBER.panelBright).setStrokeStyle(1, CYBER.magenta, 0.45)
+    this.serveButton = scene.add.rectangle(790, 496, 240, mobile ? 60 : 50, CYBER.panelBright).setStrokeStyle(1, CYBER.magenta, 0.45)
     this.serveLabel = scene.add.text(790, 496, 'ПОДАТЬ НАПИТОК  ▶', { fontFamily: FONT, fontSize: '13px', fontStyle: 'bold', color: hex(CYBER.muted) }).setOrigin(0.5)
     this.root.add([
       panel, topLine, this.glass, this.shaker.root, this.statusText, this.clearButton, clearLabel,

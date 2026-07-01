@@ -1,10 +1,13 @@
 import Phaser from 'phaser'
 import { CYBER, CYBER_FONT, hex } from './cyberTheme'
+import { isMobileViewport } from './responsive'
 
 type FullscreenControlOptions = {
   x: number
   y: number
   compact?: boolean
+  mobileX?: number
+  mobileY?: number
 }
 
 type LockableOrientation = ScreenOrientation & {
@@ -18,9 +21,11 @@ export class FullscreenControl {
   private button: Phaser.GameObjects.Rectangle
   private label?: Phaser.GameObjects.Text
   private destroyed = false
+  private options: FullscreenControlOptions
 
   constructor(scene: Phaser.Scene, options: FullscreenControlOptions) {
     this.scene = scene
+    this.options = options
     const compact = options.compact === true
     this.root = scene.add.container(options.x, options.y).setDepth(200)
     this.button = scene.add.rectangle(0, 0, compact ? 34 : 188, compact ? 30 : 38, CYBER.panel, 0.82)
@@ -45,9 +50,11 @@ export class FullscreenControl {
     scene.scale.on(Phaser.Scale.Events.LEAVE_FULLSCREEN, this.onLeave, this)
     scene.scale.on(Phaser.Scale.Events.FULLSCREEN_FAILED, this.onFailed, this)
     scene.scale.on(Phaser.Scale.Events.FULLSCREEN_UNSUPPORTED, this.onUnsupported, this)
+    scene.scale.on(Phaser.Scale.Events.RESIZE, this.updatePosition, this)
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.destroy, this)
     scene.events.once(Phaser.Scenes.Events.DESTROY, this.destroy, this)
     this.refresh()
+    this.updatePosition()
   }
 
   destroy(): void {
@@ -58,6 +65,7 @@ export class FullscreenControl {
     this.scene.scale.off(Phaser.Scale.Events.LEAVE_FULLSCREEN, this.onLeave, this)
     this.scene.scale.off(Phaser.Scale.Events.FULLSCREEN_FAILED, this.onFailed, this)
     this.scene.scale.off(Phaser.Scale.Events.FULLSCREEN_UNSUPPORTED, this.onUnsupported, this)
+    this.scene.scale.off(Phaser.Scale.Events.RESIZE, this.updatePosition, this)
     if (this.root.active) this.root.destroy(true)
   }
 
@@ -93,6 +101,14 @@ export class FullscreenControl {
   private refresh(): void {
     this.label?.setText(this.scene.scale.isFullscreen ? 'ВЫЙТИ ИЗ ЭКРАНА' : 'НА ВЕСЬ ЭКРАН')
     this.button.setStrokeStyle(1, this.scene.scale.isFullscreen ? CYBER.magenta : CYBER.cyan, 0.82)
+  }
+
+  private updatePosition(): void {
+    const mobile = isMobileViewport()
+    this.root.setPosition(
+      mobile ? (this.options.mobileX ?? this.options.x) : this.options.x,
+      mobile ? (this.options.mobileY ?? this.options.y) : this.options.y,
+    )
   }
 }
 

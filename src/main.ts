@@ -23,7 +23,12 @@ const game = new Phaser.Game({
     expandParent: true,
     fullscreenTarget: 'game-container',
   },
-  render: { antialias: true },
+  render: {
+    antialias: true,
+    antialiasGL: true,
+    roundPixels: true,
+    powerPreference: 'high-performance',
+  },
 })
 
 const refreshScale = (): void => {

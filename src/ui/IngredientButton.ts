@@ -34,9 +34,9 @@ export class IngredientButton {
     const iconX = -width / 2 + iconZoneWidth / 2 + 3
     const textX = -width / 2 + iconZoneWidth + 7
     const textWidth = Math.max(38, width - iconZoneWidth - 13)
-    const iconCircle = scene.add.circle(iconX, 0, height * 0.31, ingredientColor(ingredient), 0.3)
+    const iconCircle = scene.add.circle(iconX, 0, height * 0.34, ingredientColor(ingredient), 0.3)
       .setStrokeStyle(1, CYBER.cyan, 0.42)
-    const icon = createIngredientIcon(scene, ingredient, iconX, -1, Math.round(height * 0.48))
+    const icon = createIngredientIcon(scene, ingredient, iconX, -1, Math.round(height * 0.58))
     const label = scene.add.text(textX, 0, definition.shortName, {
       fontFamily: BODY_FONT,
       fontSize: responsiveFont(Math.max(12, Math.round(height * 0.21)), 1.06),
