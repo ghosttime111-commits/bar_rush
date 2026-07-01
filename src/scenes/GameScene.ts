@@ -41,6 +41,11 @@ type Customer = {
   busy: boolean
 }
 
+type GameSceneData = {
+  modeId?: ShiftModeId
+  devRecipeOverlayCount?: number
+}
+
 const CUSTOMER_X = [235, 480, 725]
 const CUSTOMER_Y = 184
 const CUSTOMER_SLOT_IDS = ['slot-0', 'slot-1', 'slot-2'] as const
@@ -98,7 +103,7 @@ export class GameScene extends Phaser.Scene {
     preloadBarVisuals(this)
   }
 
-  create(data: { modeId?: ShiftModeId } = {}): void {
+  create(data: GameSceneData = {}): void {
     this.clearComponentReferences()
     this.cleanedUp = false
     this.resetState(data.modeId)
@@ -129,6 +134,12 @@ export class GameScene extends Phaser.Scene {
     if (this.mode.id !== 'normal') this.time.delayedCall(250, () => {
       if (this.isSceneUsable()) this.showMessage(this.mode.tutorialText, Phaser.Display.Color.IntegerToColor(this.mode.accentColor).rgba)
     })
+    if (import.meta.env.DEV && data.devRecipeOverlayCount) {
+      void import('../game/recipeOverlayDev').then(({ createRecipeOverlayDevRecipes }) => {
+        if (!this.isSceneUsable()) return
+        this.openRecipeOverlay(createRecipeOverlayDevRecipes(data.devRecipeOverlayCount))
+      })
+    }
 
     this.shiftEvent = this.time.addEvent({
       delay: 1000,
@@ -297,11 +308,11 @@ export class GameScene extends Phaser.Scene {
     button.on('pointerdown', () => this.openRecipeOverlay())
   }
 
-  private openRecipeOverlay(): void {
+  private openRecipeOverlay(recipes: Recipe[] = this.availableRecipes): void {
     if (this.overlayOpen || this.ended) return
     this.overlayOpen = true
     this.syncShiftPause()
-    this.recipeOverlay = new RecipeOverlay(this, this.availableRecipes, () => {
+    this.recipeOverlay = new RecipeOverlay(this, recipes, () => {
       if (!this.isSceneUsable()) return
       this.recipeOverlay = undefined
       this.overlayOpen = false
@@ -330,7 +341,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   private syncShiftPause(): void {
-    if (this.shiftEvent) this.shiftEvent.paused = this.overlayOpen || this.tabPaused
+    const paused = this.overlayOpen || this.tabPaused
+    if (this.shiftEvent) this.shiftEvent.paused = paused
+    if (paused) this.tweens.pauseAll()
+    else this.tweens.resumeAll()
   }
 
   private createMessageToast(): void {

@@ -1,9 +1,10 @@
 import Phaser from 'phaser'
 import type { Recipe } from '../game/recipes'
 import { createIngredientSequence } from './IngredientIcon'
-import { preparationIcon, preparationLabel } from '../game/preparationMethods'
+import { preparationLabel } from '../game/preparationMethods'
 import { BODY_FONT, CYBER, CYBER_FONT, hex, UI_RADIUS, UI_STROKE } from './cyberTheme'
 import { createCocktailIcon } from './CocktailIcon'
+import { createPreparationMethodIcon } from './PreparationMethodIcon'
 
 export class RecipeCard {
   readonly root: Phaser.GameObjects.Container
@@ -42,9 +43,13 @@ export class RecipeCard {
       fontFamily: BODY_FONT, fontSize: '11px', color: unlocked ? '#aebad0' : hex(CYBER.muted),
       wordWrap: { width: 300 },
     }).setOrigin(0, 0.5)
-    const method = scene.add.text(177, 43, unlocked ? `${preparationIcon(recipe.preparationMethod)} ${preparationLabel(recipe.preparationMethod)}` : '', {
+    const method = scene.add.text(177, 43, unlocked ? preparationLabel(recipe.preparationMethod) : '', {
       fontFamily: CYBER_FONT, fontSize: '10px', fontStyle: 'bold', color: recipe.preparationMethod === 'shake' ? hex(CYBER.magenta) : hex(CYBER.cyan),
     }).setOrigin(1, 0.5)
+    const methodIcon = unlocked
+      ? createPreparationMethodIcon(scene, recipe.preparationMethod, 177 - method.width - 15, 43, 18)
+      : undefined
     this.root.add([iconPlate, icon, name, difficulty, ingredients, footer, method])
+    if (methodIcon) this.root.add(methodIcon)
   }
 }

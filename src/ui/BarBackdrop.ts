@@ -3,6 +3,7 @@ import type { ShiftModeId } from '../game/shiftModes'
 import { preloadIngredientIcons } from './IngredientIcon'
 import { preloadCyberUiIcons } from './IconFactory'
 import { preloadCocktailIcons } from './CocktailIcon'
+import { preloadPreparationMethodIcons } from './PreparationMethodIcon'
 import { getLayout } from './LayoutManager'
 
 export const BAR_CYBER_KEY = 'bar-interior-cyberpunk'
@@ -26,6 +27,7 @@ export function preloadBarVisuals(scene: Phaser.Scene): void {
   preloadIngredientIcons(scene)
   preloadCyberUiIcons(scene)
   preloadCocktailIcons(scene)
+  preloadPreparationMethodIcons(scene)
   scene.load.on('loaderror', (file: Phaser.Loader.File) => {
     if (import.meta.env.DEV && file.key === BAR_CYBER_HD_KEY) {
       console.warn('[Bar Rush] HD-фон не загрузился, используется исходный киберпанк-фон.')
@@ -34,6 +36,9 @@ export function preloadBarVisuals(scene: Phaser.Scene): void {
     }
     if (import.meta.env.DEV && String(file.key).startsWith('ingredient-')) {
       console.warn(`[Bar Rush] Иконка ${file.key} не загрузилась, используется Graphics fallback.`)
+    }
+    if (import.meta.env.DEV && String(file.key).startsWith('preparation-method-')) {
+      console.warn(`[Bar Rush] Иконка способа приготовления ${file.key} не загрузилась, используется Graphics fallback.`)
     }
   })
 }

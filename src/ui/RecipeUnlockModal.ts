@@ -2,8 +2,10 @@ import Phaser from 'phaser'
 import type { Recipe } from '../game/recipes'
 import { audioManager } from '../audio/AudioManager'
 import { createIngredientSequence } from './IngredientIcon'
-import { BODY_FONT, CYBER, CYBER_FONT, DISPLAY_FONT, UI_RADIUS, UI_STROKE } from './cyberTheme'
+import { preparationLabel } from '../game/preparationMethods'
+import { BODY_FONT, CYBER, CYBER_FONT, DISPLAY_FONT, hex, UI_RADIUS, UI_STROKE } from './cyberTheme'
 import { createCocktailIcon } from './CocktailIcon'
+import { createPreparationMethodIcon } from './PreparationMethodIcon'
 
 export class RecipeUnlockModal {
   readonly root: Phaser.GameObjects.Container
@@ -27,9 +29,16 @@ export class RecipeUnlockModal {
     const line = createIngredientSequence(scene, recipe.ingredients, 285, 291, {
       iconSize: 18, showNames: true, color: '#ddcfae', maxWidth: 390,
     })
+    const methodIcon = createPreparationMethodIcon(scene, recipe.preparationMethod, 421, 335, 24)
+    const method = scene.add.text(442, 335, preparationLabel(recipe.preparationMethod), {
+      fontFamily: CYBER_FONT,
+      fontSize: '12px',
+      fontStyle: 'bold',
+      color: recipe.preparationMethod === 'shake' ? hex(CYBER.magenta) : hex(CYBER.cyan),
+    }).setOrigin(0, 0.5)
     const view = this.button(scene, 370, 397, 200, 'ПОСМОТРЕТЬ РЕЦЕПТЫ', 0x3a2b40, onRecipes)
     const next = this.button(scene, 590, 397, 190, 'ПРОДОЛЖИТЬ  →', 0xc74f4f, onContinue)
-    this.root.add([blocker, glow, panel, title, iconPlate, icon, name, line, ...view, ...next])
+    this.root.add([blocker, glow, panel, title, iconPlate, icon, name, line, methodIcon, method, ...view, ...next])
     scene.tweens.add({ targets: [panel, title, icon, name, line], scaleX: { from: 0.86, to: 1 }, scaleY: { from: 0.86, to: 1 }, duration: 220, ease: 'Back.easeOut' })
     scene.tweens.add({ targets: icon, angle: { from: -6, to: 6 }, y: 188, duration: 260, yoyo: true, repeat: 1 })
     for (let index = 0; index < 18; index += 1) {

@@ -25,7 +25,7 @@ import type { PlayerProgress } from '../game/progress'
 import { audioManager } from '../audio/AudioManager'
 
 type ProgressAction = () => PlayerProgress
-type DevAction = ProgressAction | 'reload' | `start:${'fridayRush' | 'vipNight' | 'shakerNight'}`
+type DevAction = ProgressAction | 'reload' | 'test:recipe-overlay' | `start:${'fridayRush' | 'vipNight' | 'shakerNight'}`
 
 export class DevPanel {
   private scene: Phaser.Scene
@@ -117,6 +117,7 @@ export class DevPanel {
       { label: 'СТАРТ: ШЕЙКЕРЫ', action: 'start:shakerNight' },
       { label: 'СБРОС СТАТ. ОСОБЫХ', action: devResetSpecialStats },
       { label: 'СБРОС ОБУЧ. ОСОБЫХ', action: devResetSpecialTutorial },
+      { label: 'ТЕСТ: 20 РЕЦЕПТОВ', action: 'test:recipe-overlay' },
     ]
 
     actions.forEach((item, index) => {
@@ -127,6 +128,7 @@ export class DevPanel {
       this.createButton(x, y, 122, item.label, () => {
         if (typeof item.action === 'string') {
           if (item.action === 'reload') this.scene.scene.restart()
+          else if (item.action === 'test:recipe-overlay') this.scene.scene.start('GameScene', { devRecipeOverlayCount: 20 })
           else this.scene.scene.start('GameScene', { modeId: item.action.slice(6) })
           return
         }
