@@ -1,0 +1,48 @@
+:root {
+  font-family: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+  color: #fff;
+  background: #050611;
+  font-size: clamp(14px, 1.6vmin, 18px);
+}
+* { box-sizing: border-box; }
+html, body {
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+body {
+  background:
+    radial-gradient(circle at 50% 8%, rgba(41, 218, 238, .12), transparent 36%),
+    radial-gradient(circle at 80% 25%, rgba(255, 63, 164, .1), transparent 35%),
+    linear-gradient(150deg, #040510, #10132a 55%, #070611);
+}
+#app {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  padding:
+    env(safe-area-inset-top)
+    env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+  overflow: hidden;
+}
+canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  box-shadow: 0 0 0 1px #34e7f522, 0 24px 80px #000d;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+@media (max-width: 700px), (max-height: 500px) {
+  canvas { box-shadow: none; }
+}

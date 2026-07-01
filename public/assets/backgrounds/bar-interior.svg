@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#160f20"/>
+      <stop offset=".58" stop-color="#382033"/>
+      <stop offset="1" stop-color="#1a101a"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6d3828"/>
+      <stop offset=".45" stop-color="#a95d37"/>
+      <stop offset="1" stop-color="#51251f"/>
+    </linearGradient>
+    <radialGradient id="lampGlow">
+      <stop offset="0" stop-color="#ffc76b" stop-opacity=".42"/>
+      <stop offset="1" stop-color="#ffc76b" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vignette">
+      <stop offset=".55" stop-color="#09060d" stop-opacity="0"/>
+      <stop offset="1" stop-color="#09060d" stop-opacity=".65"/>
+    </radialGradient>
+    <filter id="neon" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#wall)"/>
+  <path d="M0 0h340v1080H0zM1580 0h340v1080h-340z" fill="#110b18" opacity=".4"/>
+  <path d="M0 138h1920v18H0zM0 548h1920v22H0z" fill="#4d2938" opacity=".55"/>
+
+  <g opacity=".76">
+    <rect x="95" y="205" width="520" height="285" rx="28" fill="#17101c" stroke="#6d4052" stroke-width="7"/>
+    <rect x="1305" y="205" width="520" height="285" rx="28" fill="#17101c" stroke="#6d4052" stroke-width="7"/>
+    <g fill="#7d4a35">
+      <rect x="125" y="292" width="460" height="16" rx="8"/><rect x="125" y="414" width="460" height="16" rx="8"/>
+      <rect x="1335" y="292" width="460" height="16" rx="8"/><rect x="1335" y="414" width="460" height="16" rx="8"/>
+    </g>
+    <g stroke="#301d29" stroke-width="8">
+      <path d="M165 286v-61h28v61m45 0v-95h34v95m47 0v-72h26v72m52 0v-105h38v105m45 0v-67h25v67"/>
+      <path d="M1375 286v-70h28v70m48 0v-101h36v101m49 0v-62h25v62m48 0v-91h34v91m45 0v-74h29v74"/>
+      <path d="M165 408v-62h29v62m54 0v-86h33v86m53 0v-57h25v57m55 0v-78h35v78m47 0v-64h28v64"/>
+      <path d="M1375 408v-80h34v80m52 0v-58h25v58m55 0v-91h36v91m54 0v-67h29v67m47 0v-83h34v83"/>
+    </g>
+    <g fill="#4b8b72"><path d="M167 225h24v61h-24zM1377 216h24v70h-24zM1463 185h31v101h-31z"/></g>
+    <g fill="#b75b4d"><path d="M241 191h28v95h-28zM417 181h34v105h-34zM1544 224h22v62h-22z"/></g>
+    <g fill="#d29a45"><path d="M322 214h20v72h-20zM148 346h23v62h-23zM1634 341h24v67h-24z"/></g>
+  </g>
+
+  <g>
+    <path d="M0 0h1920" stroke="#241828" stroke-width="20"/>
+    <g transform="translate(415)">
+      <path d="M0 0v126" stroke="#493544" stroke-width="8"/>
+      <path d="M-63 126h126l-28 63h-70z" fill="#ce8247" stroke="#4a2931" stroke-width="8"/>
+      <circle cy="220" r="170" fill="url(#lampGlow)"/>
+    </g>
+    <g transform="translate(960)">
+      <path d="M0 0v105" stroke="#493544" stroke-width="8"/>
+      <path d="M-68 105h136l-30 67h-76z" fill="#dda052" stroke="#4a2931" stroke-width="8"/>
+      <circle cy="205" r="190" fill="url(#lampGlow)"/>
+    </g>
+    <g transform="translate(1505)">
+      <path d="M0 0v126" stroke="#493544" stroke-width="8"/>
+      <path d="M-63 126h126l-28 63h-70z" fill="#ce8247" stroke="#4a2931" stroke-width="8"/>
+      <circle cy="220" r="170" fill="url(#lampGlow)"/>
+    </g>
+  </g>
+
+  <g transform="translate(160 145)" filter="url(#neon)">
+    <rect width="250" height="82" rx="20" fill="#251224" stroke="#9f536d" stroke-width="5"/>
+    <text x="125" y="53" text-anchor="middle" font-family="Arial, sans-serif" font-size="35" font-weight="700"
+          fill="#ffc66a" stroke="#7a3546" stroke-width="2">BAR RUSH</text>
+  </g>
+
+  <path d="M0 606h1920v474H0z" fill="#120b12"/>
+  <path d="M-20 585h1960v82H-20z" fill="url(#wood)" stroke="#32191a" stroke-width="12"/>
+  <path d="M0 594h1920v15H0z" fill="#e0924c" opacity=".8"/>
+  <path d="M0 667h1920v413H0z" fill="#1b1017"/>
+  <g opacity=".18" stroke="#a65f43" stroke-width="5">
+    <path d="M0 790h1920M0 930h1920"/>
+    <path d="M120 667L40 1080M420 667l-80 413M720 667l-80 413M1020 667l-80 413M1320 667l-80 413M1620 667l-80 413"/>
+  </g>
+  <circle cx="960" cy="400" r="400" fill="#211323" opacity=".3"/>
+  <rect width="1920" height="1080" fill="url(#vignette)"/>
+</svg>
