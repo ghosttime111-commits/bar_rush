@@ -6,6 +6,7 @@ import { RecipeCard } from '../ui/RecipeCard'
 import { audioManager } from '../audio/AudioManager'
 import { ShakeTutorialModal } from '../ui/ShakeTutorialModal'
 import { CYBER, CYBER_FONT } from '../ui/cyberTheme'
+import { installResponsiveLayout } from '../ui/LayoutManager'
 
 type RecipeBookData = {
   tutorial?: boolean
@@ -28,6 +29,7 @@ export class RecipeBookScene extends Phaser.Scene {
     this.page = 0
     this.returnScene = data.returnScene ?? 'UpgradeScene'
     this.tutorial = data.tutorial === true
+    installResponsiveLayout(this)
     audioManager.setMood('calm')
     drawBarBackdrop(this)
     this.add.rectangle(480, 270, 960, 540, CYBER.void, 0.22)

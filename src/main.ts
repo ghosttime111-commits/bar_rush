@@ -10,17 +10,18 @@ audioManager.initialize()
 
 const game = new Phaser.Game({
   type: Phaser.AUTO,
-  parent: 'app',
+  parent: 'game-container',
   width: 960,
   height: 540,
   backgroundColor: '#100d16',
   scene: [UpgradeScene, RecipeBookScene, GameScene, ResultScene],
   scale: {
-    mode: Phaser.Scale.FIT,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
+    mode: Phaser.Scale.RESIZE,
+    autoCenter: Phaser.Scale.NO_CENTER,
     width: 960,
     height: 540,
     expandParent: true,
+    fullscreenTarget: 'game-container',
   },
   render: { antialias: true },
 })

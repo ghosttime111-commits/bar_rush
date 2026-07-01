@@ -3,6 +3,7 @@ import type { ShiftModeId } from '../game/shiftModes'
 import { preloadIngredientIcons } from './IngredientIcon'
 import { preloadCyberUiIcons } from './IconFactory'
 import { preloadCocktailIcons } from './CocktailIcon'
+import { getLayout } from './LayoutManager'
 
 export const BAR_CYBER_KEY = 'bar-interior-cyberpunk'
 const BAR_CYBER_PATH = 'assets/backgrounds/cyberpunk/night-bar.png'
@@ -41,44 +42,49 @@ export function drawBarBackdrop(scene: Phaser.Scene, options: BackdropOptions = 
       ? scene.add.image(480, 270, BAR_SVG_KEY).setDepth(-30)
       : undefined
 
+  const procedural = background ? undefined : drawProceduralFallback(scene)
+  const dimming = drawDimming(scene)
+  const modeTint = drawModeTint(scene, options.modeId)
   const resizeBackground = (): void => {
-    if (!background?.active) return
-    const width = scene.scale.width
-    const height = scene.scale.height
-    const imageWidth = Math.max(1, background.width)
-    const imageHeight = Math.max(1, background.height)
-    const coverScale = Math.max(width / imageWidth, height / imageHeight)
-    background.setPosition(width / 2, height / 2).setScale(coverScale)
+    const layout = getLayout(scene)
+    if (background?.active) {
+      const imageWidth = Math.max(1, background.width)
+      const imageHeight = Math.max(1, background.height)
+      const coverScale = Math.max(layout.viewWidth / imageWidth, layout.viewHeight / imageHeight)
+      background.setPosition(layout.viewCenterX, layout.viewCenterY).setScale(coverScale)
+    }
+    if (procedural?.active) redrawProceduralFallback(procedural, layout.viewCenterX, layout.viewCenterY, layout.viewWidth, layout.viewHeight)
+    dimming.full.setPosition(layout.viewCenterX, layout.viewCenterY).setDisplaySize(layout.viewWidth, layout.viewHeight)
+    modeTint?.setPosition(layout.viewCenterX, layout.viewCenterY).setDisplaySize(layout.viewWidth, layout.viewHeight)
   }
-  if (background) resizeBackground()
-  else drawProceduralFallback(scene)
+  resizeBackground()
 
-  drawDimming(scene)
-  drawModeTint(scene, options.modeId)
   const effectTweens = drawLocalLighting(scene, options.modeId)
   if (scene.scene.key === 'GameScene') drawIngredientReadabilityLayer(scene)
   registerBackdropLifecycle(scene, resizeBackground, effectTweens)
 }
 
-function drawDimming(scene: Phaser.Scene): void {
+function drawDimming(scene: Phaser.Scene): { full: Phaser.GameObjects.Rectangle; center: Phaser.GameObjects.Rectangle } {
   const alpha = scene.scene.key === 'GameScene'
     ? 0.23
     : scene.scene.key === 'ResultScene'
       ? 0.32
       : 0.36
-  scene.add.rectangle(480, 270, 960, 540, 0x060817, alpha).setDepth(-26)
-  scene.add.rectangle(480, 178, 690, 230, 0x080b20, 0.12).setDepth(-25)
+  return {
+    full: scene.add.rectangle(480, 270, 960, 540, 0x060817, alpha).setDepth(-26),
+    center: scene.add.rectangle(480, 178, 690, 230, 0x080b20, 0.12).setDepth(-25),
+  }
 }
 
-function drawModeTint(scene: Phaser.Scene, modeId: ShiftModeId | undefined): void {
-  if (!modeId || modeId === 'normal') return
+function drawModeTint(scene: Phaser.Scene, modeId: ShiftModeId | undefined): Phaser.GameObjects.Rectangle | undefined {
+  if (!modeId || modeId === 'normal') return undefined
   const tint = modeId === 'fridayRush'
     ? 0xf05c32
     : modeId === 'vipNight'
       ? 0xe8ba55
       : 0x6659dd
   const alpha = modeId === 'vipNight' ? 0.075 : 0.085
-  scene.add.rectangle(480, 270, 960, 540, tint, alpha).setDepth(-24)
+  return scene.add.rectangle(480, 270, 960, 540, tint, alpha).setDepth(-24)
 }
 
 function drawLocalLighting(scene: Phaser.Scene, modeId: ShiftModeId | undefined): Phaser.Tweens.Tween[] {
@@ -126,9 +132,22 @@ function registerBackdropLifecycle(
   scene.events.once(Phaser.Scenes.Events.DESTROY, cleanup)
 }
 
-function drawProceduralFallback(scene: Phaser.Scene): void {
+function drawProceduralFallback(scene: Phaser.Scene): Phaser.GameObjects.Graphics {
   const g = scene.add.graphics().setDepth(-30)
-  g.fillGradientStyle(0x100d15, 0x100d15, 0x2e1c2d, 0x21131f).fillRect(0, 0, 960, 540)
+  redrawProceduralFallback(g, 480, 270, 960, 540)
+  return g
+}
+
+function redrawProceduralFallback(
+  g: Phaser.GameObjects.Graphics,
+  centerX: number,
+  centerY: number,
+  width: number,
+  height: number,
+): void {
+  g.clear()
+  g.fillGradientStyle(0x100d15, 0x100d15, 0x2e1c2d, 0x21131f)
+    .fillRect(centerX - width / 2, centerY - height / 2, width, height)
   g.fillStyle(0x211522, 0.86).fillRoundedRect(30, 64, 900, 245, 20)
   const bottleColors = [0x4d9472, 0xc26b54, 0xd3a14e, 0x5f75a5, 0x925e9d]
   for (const shelfY of [111, 171]) {

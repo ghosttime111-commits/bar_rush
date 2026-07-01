@@ -13,6 +13,8 @@ import { SpecialShiftOfferModal } from '../ui/SpecialShiftOfferModal'
 import { createUpgradeIcon, preloadUpgradeIcons } from '../ui/UpgradeIcon'
 import type { ShiftModeId } from '../game/shiftModes'
 import { BODY_FONT, CYBER, CYBER_FONT } from '../ui/cyberTheme'
+import { installResponsiveLayout } from '../ui/LayoutManager'
+import { FullscreenControl } from '../ui/FullscreenControl'
 
 type UpgradeCard = { root: Phaser.GameObjects.Container; priceText: Phaser.GameObjects.Text; levelText: Phaser.GameObjects.Text; effectText: Phaser.GameObjects.Text; button: Phaser.GameObjects.Rectangle; buttonText: Phaser.GameObjects.Text }
 
@@ -34,6 +36,7 @@ export class UpgradeScene extends Phaser.Scene {
     this.transitionInProgress = false
     this.progress = loadProgress()
     if (!this.progress.recipeTutorialSeen) { this.scene.start('RecipeBookScene', { tutorial: true, returnScene: 'UpgradeScene' }); return }
+    installResponsiveLayout(this)
     audioManager.setMood('calm')
     audioManager.setMusicIntensity(1)
     drawBarBackdrop(this)
@@ -45,6 +48,7 @@ export class UpgradeScene extends Phaser.Scene {
     this.statusText = this.add.text(480, 454, '', { fontFamily: 'Trebuchet MS', fontSize: '12px', fontStyle: 'bold', color: '#7ee5a2' }).setOrigin(0.5)
     this.createFooterButtons()
     this.createAudioSettingsButton()
+    new FullscreenControl(this, { x: 150, y: 456 })
     this.createSpecialShiftBanner()
     this.renderCategory()
     this.attachDevPanel()

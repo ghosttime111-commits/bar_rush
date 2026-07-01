@@ -28,6 +28,8 @@ import type { ShiftModeDefinition, ShiftModeId } from '../game/shiftModes'
 import { ShiftModeBadge } from '../ui/ShiftModeBadge'
 import { CYBER, CYBER_FONT } from '../ui/cyberTheme'
 import { createCyberUiIcon } from '../ui/IconFactory'
+import { installResponsiveLayout } from '../ui/LayoutManager'
+import { FullscreenControl } from '../ui/FullscreenControl'
 
 type Customer = {
   card: CustomerCard
@@ -94,6 +96,7 @@ export class GameScene extends Phaser.Scene {
     this.clearComponentReferences()
     this.cleanedUp = false
     this.resetState(data.modeId)
+    installResponsiveLayout(this)
     audioManager.setMood('game')
     audioManager.setMusicIntensity(this.mode.musicIntensity)
     audioManager.notify(this.mode.id === 'normal' ? 'shiftStarted' : `${this.mode.id}Start` as 'fridayRushStart' | 'vipNightStart' | 'shakerNightStart')
@@ -101,6 +104,7 @@ export class GameScene extends Phaser.Scene {
     this.hud = new HudBar(this)
     if (this.mode.id !== 'normal') this.modeBadge = new ShiftModeBadge(this, this.mode)
     this.createRecipeButton()
+    new FullscreenControl(this, { x: 891, y: 20, compact: true })
     this.createCustomers()
     this.createIngredientButtons()
     this.drinkBuilder = new DrinkBuilder(

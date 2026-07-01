@@ -9,6 +9,7 @@ import type { ShiftModeId } from '../game/shiftModes'
 import { SpecialShiftOfferModal } from '../ui/SpecialShiftOfferModal'
 import { drawBarBackdrop, preloadBarVisuals } from '../ui/BarBackdrop'
 import { BODY_FONT, CYBER, CYBER_FONT } from '../ui/cyberTheme'
+import { installResponsiveLayout } from '../ui/LayoutManager'
 
 type ResultData = {
   money: number; baseMoney: number; reputation: number; served: number; missed: number
@@ -25,6 +26,7 @@ export class ResultScene extends Phaser.Scene {
   preload(): void { preloadBarVisuals(this) }
 
   create(data: ResultData): void {
+    installResponsiveLayout(this)
     this.cameras.main.setBackgroundColor('#100d16')
     audioManager.setMood('calm')
     audioManager.setMusicIntensity(1)

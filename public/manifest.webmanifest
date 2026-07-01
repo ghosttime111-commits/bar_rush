@@ -1,0 +1,9 @@
+{
+  "name": "Bar Rush",
+  "short_name": "Bar Rush",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#050611",
+  "theme_color": "#050611"
+}
