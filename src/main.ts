@@ -5,34 +5,51 @@ import { ResultScene } from './scenes/ResultScene'
 import { UpgradeScene } from './scenes/UpgradeScene'
 import { RecipeBookScene } from './scenes/RecipeBookScene'
 import { audioManager } from './audio/AudioManager'
+import { initialRenderSize, renderSizeForViewport } from './ui/RenderQualityManager'
 
 audioManager.initialize()
+const renderSize = initialRenderSize()
 
 const game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game-container',
-  width: 960,
-  height: 540,
+  width: renderSize.width,
+  height: renderSize.height,
   backgroundColor: '#100d16',
   scene: [UpgradeScene, RecipeBookScene, GameScene, ResultScene],
   scale: {
-    mode: Phaser.Scale.RESIZE,
+    mode: Phaser.Scale.EXPAND,
     autoCenter: Phaser.Scale.NO_CENTER,
-    width: 960,
-    height: 540,
+    width: renderSize.width,
+    height: renderSize.height,
     expandParent: true,
     fullscreenTarget: 'game-container',
   },
   render: {
     antialias: true,
     antialiasGL: true,
-    roundPixels: true,
+    pixelArt: false,
+    roundPixels: false,
     powerPreference: 'high-performance',
   },
 })
 
+let resizeFrame = 0
 const refreshScale = (): void => {
-  game.scale.refresh()
+  cancelAnimationFrame(resizeFrame)
+  resizeFrame = requestAnimationFrame(() => {
+    const next = renderSizeForViewport(window.innerWidth, window.innerHeight)
+    if (game.scale.gameSize.width !== next.width || game.scale.gameSize.height !== next.height) {
+      // EXPAND reads these base dimensions on every refresh. Keep them in sync so an
+      // orientation change does not retain the previous landscape minimum.
+      const mutableConfig = game.config as unknown as { width: number; height: number }
+      mutableConfig.width = next.width
+      mutableConfig.height = next.height
+      game.scale.setGameSize(next.width, next.height)
+    } else {
+      game.scale.refresh()
+    }
+  })
 }
 window.addEventListener('resize', refreshScale)
 window.addEventListener('orientationchange', refreshScale)

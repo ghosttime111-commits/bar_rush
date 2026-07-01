@@ -8,6 +8,8 @@ const sheets = [
     output: 'public/assets/icons/ingredients/cyberpunk',
     columns: 6,
     rows: 3,
+    iconSize: 108,
+    canvasSize: 128,
     names: [
       'beer', 'whisky', 'ice', 'vodka', 'rum', 'lime',
       'mint', 'soda', 'cola', 'gin', 'tonic', 'orange-juice',
@@ -19,6 +21,8 @@ const sheets = [
     output: 'public/assets/icons/ui/cyberpunk',
     columns: 4,
     rows: 2,
+    iconSize: 216,
+    canvasSize: 256,
     names: ['shaker', 'recipe-book', 'sound', 'pause', 'special-shift', 'credits', 'reputation', 'combo'],
   },
   {
@@ -26,6 +30,8 @@ const sheets = [
     output: 'public/assets/icons/upgrades/cyberpunk',
     columns: 4,
     rows: 3,
+    iconSize: 108,
+    canvasSize: 128,
     names: [
       'quick-hands', 'better-glasses', 'cozy-bar', 'advertising',
       'pro-shaker', 'tip-jar', 'bar-insurance', 'combo-master',
@@ -66,13 +72,18 @@ for (const sheet of sheets) {
       .toBuffer()
     const icon = await sharp(cell)
       .trim({ background: { r: 0, g: 0, b: 0, alpha: 0 }, threshold: 8 })
-      .resize({ width: 108, height: 108, fit: 'inside', withoutEnlargement: false })
+      .resize({ width: sheet.iconSize, height: sheet.iconSize, fit: 'inside', withoutEnlargement: false })
       .png()
       .toBuffer()
     await sharp({
-      create: { width: 128, height: 128, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
+      create: {
+        width: sheet.canvasSize,
+        height: sheet.canvasSize,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      },
     }).composite([{ input: icon, gravity: 'center' }]).png().toFile(path.join(outputDir, `${sheet.names[index]}.png`))
   }
 }
 
-console.log('Подготовлено 38 киберпанк-иконок 128×128.')
+console.log('Подготовлены киберпанк-иконки: ингредиенты и улучшения 128×128, UI 256×256.')

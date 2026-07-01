@@ -22,6 +22,8 @@ export class FullscreenControl {
   private label?: Phaser.GameObjects.Text
   private destroyed = false
   private options: FullscreenControlOptions
+  private longPress?: Phaser.Time.TimerEvent
+  private longPressTriggered = false
 
   constructor(scene: Phaser.Scene, options: FullscreenControlOptions) {
     this.scene = scene
@@ -45,7 +47,9 @@ export class FullscreenControl {
       this.root.add(this.label)
     }
 
-    this.button.on('pointerup', this.toggle, this)
+    this.button.on('pointerdown', this.startLongPress, this)
+    this.button.on('pointerup', this.finishPress, this)
+    this.button.on('pointerout', this.cancelLongPress, this)
     scene.scale.on(Phaser.Scale.Events.ENTER_FULLSCREEN, this.onEnter, this)
     scene.scale.on(Phaser.Scale.Events.LEAVE_FULLSCREEN, this.onLeave, this)
     scene.scale.on(Phaser.Scale.Events.FULLSCREEN_FAILED, this.onFailed, this)
@@ -61,6 +65,7 @@ export class FullscreenControl {
     if (this.destroyed) return
     this.destroyed = true
     this.button.removeAllListeners()
+    this.cancelLongPress()
     this.scene.scale.off(Phaser.Scale.Events.ENTER_FULLSCREEN, this.onEnter, this)
     this.scene.scale.off(Phaser.Scale.Events.LEAVE_FULLSCREEN, this.onLeave, this)
     this.scene.scale.off(Phaser.Scale.Events.FULLSCREEN_FAILED, this.onFailed, this)
@@ -72,6 +77,30 @@ export class FullscreenControl {
   private readonly toggle = (): void => {
     if (this.scene.scale.isFullscreen) this.scene.scale.stopFullscreen()
     else this.scene.scale.startFullscreen({ navigationUI: 'hide' })
+  }
+
+  private startLongPress(): void {
+    this.longPressTriggered = false
+    if (!import.meta.env.DEV || !isMobileViewport()) return
+    this.longPress?.destroy()
+    this.longPress = this.scene.time.delayedCall(1900, () => {
+      this.longPressTriggered = true
+      window.dispatchEvent(new Event('bar-rush-toggle-render-diagnostics'))
+    })
+  }
+
+  private finishPress(): void {
+    this.cancelLongPress()
+    if (this.longPressTriggered) {
+      this.longPressTriggered = false
+      return
+    }
+    this.toggle()
+  }
+
+  private cancelLongPress(): void {
+    this.longPress?.destroy()
+    this.longPress = undefined
   }
 
   private onEnter(): void {

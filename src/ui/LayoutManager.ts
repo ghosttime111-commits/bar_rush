@@ -1,6 +1,5 @@
 import Phaser from 'phaser'
 import { CYBER, CYBER_FONT, hex } from './cyberTheme'
-import { renderDensity } from './responsive'
 
 export const DESIGN_WIDTH = 960
 export const DESIGN_HEIGHT = 540
@@ -29,13 +28,18 @@ export function getLayout(scene: Phaser.Scene): LayoutMetrics {
   const viewportWidth = Math.max(1, scene.scale.width)
   const viewportHeight = Math.max(1, scene.scale.height)
   const insets = readSafeInsets()
-  const availableWidth = Math.max(1, viewportWidth - insets.left - insets.right)
-  const availableHeight = Math.max(1, viewportHeight - insets.top - insets.bottom)
+  const canvas = scene.game.canvas
+  const cssWidth = Math.max(1, canvas.clientWidth)
+  const cssHeight = Math.max(1, canvas.clientHeight)
+  const bufferScaleX = viewportWidth / cssWidth
+  const bufferScaleY = viewportHeight / cssHeight
+  const availableWidth = Math.max(1, viewportWidth - (insets.left + insets.right) * bufferScaleX)
+  const availableHeight = Math.max(1, viewportHeight - (insets.top + insets.bottom) * bufferScaleY)
   const zoom = Math.max(0.01, Math.min(availableWidth / DESIGN_WIDTH, availableHeight / DESIGN_HEIGHT))
   const viewWidth = viewportWidth / zoom
   const viewHeight = viewportHeight / zoom
-  const viewCenterX = DESIGN_WIDTH / 2 - (insets.left - insets.right) / (2 * zoom)
-  const viewCenterY = DESIGN_HEIGHT / 2 - (insets.top - insets.bottom) / (2 * zoom)
+  const viewCenterX = DESIGN_WIDTH / 2 - (insets.left - insets.right) * bufferScaleX / (2 * zoom)
+  const viewCenterY = DESIGN_HEIGHT / 2 - (insets.top - insets.bottom) * bufferScaleY / (2 * zoom)
   return {
     viewportWidth,
     viewportHeight,
@@ -68,8 +72,9 @@ export function installResponsiveLayout(scene: Phaser.Scene): () => void {
     color: hex(CYBER.white),
     align: 'center',
   }).setOrigin(0.5).setDepth(9002).setVisible(false)
+  let textResolution = 1
   const sharpenText = (gameObject: Phaser.GameObjects.GameObject): void => {
-    if (gameObject instanceof Phaser.GameObjects.Text) gameObject.setResolution(renderDensity())
+    if (gameObject instanceof Phaser.GameObjects.Text) gameObject.setResolution(textResolution)
   }
   scene.children.list.forEach(sharpenText)
   scene.sys.displayList.events.on(Phaser.Scenes.Events.ADDED_TO_SCENE, sharpenText)
@@ -77,6 +82,8 @@ export function installResponsiveLayout(scene: Phaser.Scene): () => void {
   const apply = (): void => {
     if (destroyed || !scene.cameras.main) return
     const layout = getLayout(scene)
+    textResolution = Math.max(1, layout.zoom)
+    scene.children.list.forEach(sharpenText)
     scene.cameras.main
       .setViewport(0, 0, layout.viewportWidth, layout.viewportHeight)
       .setZoom(layout.zoom)
@@ -93,6 +100,11 @@ export function installResponsiveLayout(scene: Phaser.Scene): () => void {
   window.addEventListener('orientationchange', onOrientationChange)
   window.visualViewport?.addEventListener('resize', apply)
   apply()
+  if (import.meta.env.DEV) {
+    void import('./RenderDiagnostics').then(({ attachRenderDiagnostics }) => {
+      if (!destroyed && scene.sys.isActive()) attachRenderDiagnostics(scene)
+    })
+  }
 
   const cleanup = (): void => {
     if (destroyed) return

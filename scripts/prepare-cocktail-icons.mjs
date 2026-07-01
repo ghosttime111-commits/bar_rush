@@ -40,12 +40,12 @@ for (let index = 0; index < names.length; index += 1) {
     .toBuffer()
   const icon = await sharp(cell)
     .trim({ background: { r: 0, g: 0, b: 0, alpha: 0 }, threshold: 8 })
-    .resize({ width: 108, height: 108, fit: 'inside', withoutEnlargement: false })
+    .resize({ width: 216, height: 216, fit: 'inside', withoutEnlargement: false })
     .png()
     .toBuffer()
   await sharp({
-    create: { width: 128, height: 128, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
+    create: { width: 256, height: 256, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
   }).composite([{ input: icon, gravity: 'center' }]).png().toFile(path.join(outputDir, `${names[index]}.png`))
 }
 
-console.log(`Подготовлено ${names.length} иконок коктейлей 128×128.`)
+console.log(`Подготовлено ${names.length} иконок коктейлей 256×256.`)

@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "prepare:customers": "node scripts/prepare-customers.mjs",
     "prepare:cyber-icons": "node scripts/prepare-cyber-icons.mjs",
-    "prepare:cocktails": "node scripts/prepare-cocktail-icons.mjs"
+    "prepare:cocktails": "node scripts/prepare-cocktail-icons.mjs",
+    "prepare:background-hd": "node scripts/prepare-background-hd.mjs",
+    "audit:assets": "node scripts/audit-asset-resolution.mjs"
   },
   "devDependencies": {
     "sharp": "^0.35.2",
