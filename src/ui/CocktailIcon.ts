@@ -40,7 +40,5 @@ export function createCocktailIcon(
   fallback.lineBetween(0, 8 * unit, 0, 15 * unit)
   fallback.lineBetween(-8 * unit, 15 * unit, 8 * unit, 15 * unit)
   root.add(fallback)
-  const legacy = scene.add.text(0, 0, recipe.icon, { fontSize: `${Math.round(size * 0.52)}px` }).setOrigin(0.5)
-  root.add(legacy)
   return root
 }

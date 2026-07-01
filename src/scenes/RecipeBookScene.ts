@@ -5,7 +5,7 @@ import { drawBarBackdrop, preloadBarVisuals } from '../ui/BarBackdrop'
 import { RecipeCard } from '../ui/RecipeCard'
 import { audioManager } from '../audio/AudioManager'
 import { ShakeTutorialModal } from '../ui/ShakeTutorialModal'
-import { CYBER, CYBER_FONT } from '../ui/cyberTheme'
+import { BODY_FONT, CYBER, DISPLAY_FONT } from '../ui/cyberTheme'
 import { installResponsiveLayout } from '../ui/LayoutManager'
 
 type RecipeBookData = {
@@ -36,12 +36,12 @@ export class RecipeBookScene extends Phaser.Scene {
     this.add.rectangle(480, 48, 650, 70, CYBER.panel, 0.93).setStrokeStyle(1, CYBER.cyan, 0.68)
     this.add.rectangle(480, 82, 648, 2, CYBER.magenta, 0.75)
     this.add.text(480, 36, '📖  КНИГА РЕЦЕПТОВ', {
-      fontFamily: CYBER_FONT, fontSize: '27px', fontStyle: 'bold', color: '#eafcff',
+      fontFamily: DISPLAY_FONT, fontSize: '25px', color: '#eafcff',
     }).setOrigin(0.5)
     this.add.text(480, 70, this.tutorial
       ? 'Новые рецепты открываются после смен. Значок шейкера означает: добавить ингредиенты, взболтать, подать.'
       : 'Открывайте новые коктейли и запоминайте состав.', {
-      fontFamily: 'Trebuchet MS', fontSize: '13px', color: '#d7cad9',
+      fontFamily: BODY_FONT, fontSize: '13px', color: '#d7cad9',
     }).setOrigin(0.5)
 
     this.createButton(120, 510, 178, this.tutorial ? 'ПОНЯТНО' : '←  НАЗАД', () => this.close())
@@ -71,7 +71,7 @@ export class RecipeBookScene extends Phaser.Scene {
       this.pageObjects.push(card.root)
     })
     const counter = this.add.text(785, 510, `${this.page + 1}/${pageCount}`, {
-      fontFamily: 'Trebuchet MS', fontSize: '13px', fontStyle: 'bold', color: '#d7cad9',
+      fontFamily: BODY_FONT, fontSize: '13px', fontStyle: 'bold', color: '#d7cad9',
     }).setOrigin(0.5)
     this.pageObjects.push(counter)
   }
@@ -90,7 +90,7 @@ export class RecipeBookScene extends Phaser.Scene {
     const button = this.add.rectangle(x, y, width, 40, CYBER.panel).setStrokeStyle(1, CYBER.cyan, 0.65)
       .setInteractive({ useHandCursor: true })
     this.add.text(x, y, label, {
-      fontFamily: 'Trebuchet MS', fontSize: '12px', fontStyle: 'bold', color: '#f7e6bd',
+      fontFamily: BODY_FONT, fontSize: '12px', fontStyle: 'bold', color: '#f7e6bd',
     }).setOrigin(0.5)
     button.on('pointerover', () => button.setFillStyle(CYBER.panelBright).setStrokeStyle(2, CYBER.magenta, 0.9))
     button.on('pointerout', () => button.setFillStyle(CYBER.panel).setStrokeStyle(1, CYBER.cyan, 0.65))

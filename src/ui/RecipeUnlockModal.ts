@@ -2,7 +2,7 @@ import Phaser from 'phaser'
 import type { Recipe } from '../game/recipes'
 import { audioManager } from '../audio/AudioManager'
 import { createIngredientSequence } from './IngredientIcon'
-import { CYBER, CYBER_FONT } from './cyberTheme'
+import { BODY_FONT, CYBER, CYBER_FONT, DISPLAY_FONT, UI_RADIUS, UI_STROKE } from './cyberTheme'
 import { createCocktailIcon } from './CocktailIcon'
 
 export class RecipeUnlockModal {
@@ -14,15 +14,15 @@ export class RecipeUnlockModal {
     const blocker = scene.add.rectangle(480, 270, 960, 540, CYBER.void, 0.84).setInteractive()
     const glow = scene.add.circle(480, 250, 210, CYBER.magenta, 0.12)
     const panel = scene.add.graphics()
-    panel.fillStyle(CYBER.panel, 1).fillRoundedRect(250, 88, 460, 364, 8)
-    panel.lineStyle(2, CYBER.cyan, 0.85).strokeRoundedRect(250, 88, 460, 364, 8)
+    panel.fillStyle(CYBER.panel, 1).fillRoundedRect(250, 88, 460, 364, UI_RADIUS.large)
+    panel.lineStyle(1.5, CYBER.cyan, UI_STROKE.strong).strokeRoundedRect(250, 88, 460, 364, UI_RADIUS.large)
     const title = scene.add.text(480, 126, 'НОВЫЙ РЕЦЕПТ!', {
-      fontFamily: CYBER_FONT, fontSize: '24px', fontStyle: 'bold', color: '#72f1ff',
+      fontFamily: DISPLAY_FONT, fontSize: '22px', color: '#72f1ff',
     }).setOrigin(0.5)
     const iconPlate = scene.add.circle(480, 196, 45, CYBER.panelBright, 0.7).setStrokeStyle(1, CYBER.cyan, 0.55)
     const icon = createCocktailIcon(scene, recipe, 480, 196, 78)
     const name = scene.add.text(480, 247, recipe.name, {
-      fontFamily: CYBER_FONT, fontSize: '23px', fontStyle: 'bold', color: '#ffffff',
+      fontFamily: BODY_FONT, fontSize: '23px', fontStyle: 'bold', color: '#ffffff',
     }).setOrigin(0.5)
     const line = createIngredientSequence(scene, recipe.ingredients, 285, 291, {
       iconSize: 18, showNames: true, color: '#ddcfae', maxWidth: 390,

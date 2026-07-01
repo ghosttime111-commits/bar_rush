@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import { INGREDIENTS, ingredientDefinition } from '../game/ingredients'
 import type { Ingredient } from '../game/ingredients'
+import { BODY_FONT } from './cyberTheme'
 
 export const TONIC_TEXTURE_KEY = 'cyber-ingredient-tonic'
 
@@ -60,7 +61,7 @@ export function createIngredientSequence(
     cursor += iconSize + 3
     if (showNames) {
       const label = scene.add.text(cursor, 0, ingredient, {
-        fontFamily: '"Segoe UI", "Trebuchet MS", Arial, sans-serif', fontSize: '11px', color,
+        fontFamily: BODY_FONT, fontSize: '11px', color,
       }).setOrigin(0, 0.5)
       root.add(label)
       cursor += label.width + gap

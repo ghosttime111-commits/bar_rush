@@ -3,7 +3,7 @@ import type { Recipe } from '../game/recipes'
 import { audioManager } from '../audio/AudioManager'
 import { createIngredientSequence } from './IngredientIcon'
 import { preparationIcon, preparationLabel } from '../game/preparationMethods'
-import { BODY_FONT, CYBER, CYBER_FONT, hex } from './cyberTheme'
+import { BODY_FONT, CYBER, CYBER_FONT, DISPLAY_FONT, hex, UI_RADIUS, UI_STROKE } from './cyberTheme'
 import { createCocktailIcon } from './CocktailIcon'
 
 export class RecipeOverlay {
@@ -15,11 +15,11 @@ export class RecipeOverlay {
     const blocker = scene.add.rectangle(480, 270, 960, 540, 0x030510, 0.88)
       .setInteractive()
     const panel = scene.add.graphics()
-    panel.fillStyle(CYBER.panel, 0.88).fillRoundedRect(92, 48, 776, 444, 8)
-    panel.lineStyle(2, CYBER.cyan, 0.75).strokeRoundedRect(92, 48, 776, 444, 8)
+    panel.fillStyle(CYBER.panel, 0.92).fillRoundedRect(92, 48, 776, 444, UI_RADIUS.large)
+    panel.lineStyle(1.5, CYBER.cyan, UI_STROKE.strong).strokeRoundedRect(92, 48, 776, 444, UI_RADIUS.large)
     panel.lineStyle(1, CYBER.magenta, 0.65).lineBetween(116, 105, 844, 105)
     const title = scene.add.text(480, 82, 'АРХИВ РЕЦЕПТОВ // ОТКРЫТ', {
-      fontFamily: CYBER_FONT, fontSize: '21px', fontStyle: 'bold', color: hex(CYBER.cyan),
+      fontFamily: DISPLAY_FONT, fontSize: '19px', color: hex(CYBER.cyan),
     }).setOrigin(0.5)
     const closeBg = scene.add.rectangle(830, 82, 42, 34, CYBER.panelBright).setStrokeStyle(1, CYBER.magenta, 0.7)
       .setInteractive({ useHandCursor: true })

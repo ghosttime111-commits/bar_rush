@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 import { audioManager } from '../audio/AudioManager'
 import type { AudioSettings } from '../game/audioSettings'
-import { CYBER } from './cyberTheme'
+import { BODY_FONT, CYBER, DISPLAY_FONT } from './cyberTheme'
 import { loadRenderQuality, RENDER_QUALITY_LABELS, saveRenderQuality } from './RenderQualityManager'
 import type { RenderQuality } from './RenderQualityManager'
 
@@ -21,7 +21,7 @@ export class AudioSettingsModal {
     panel.fillStyle(CYBER.panel, 1).fillRoundedRect(275, 50, 410, 440, 8)
     panel.lineStyle(2, CYBER.cyan, 0.75).strokeRoundedRect(275, 50, 410, 440, 8)
     const title = scene.add.text(480, 82, '⚙  НАСТРОЙКИ', {
-      fontFamily: 'Montserrat', fontSize: '21px', fontStyle: 'bold', color: '#f3c96b',
+      fontFamily: DISPLAY_FONT, fontSize: '19px', color: '#f3c96b',
     }).setOrigin(0.5)
     this.root.add([blocker, panel, title])
 
@@ -42,7 +42,7 @@ export class AudioSettingsModal {
     })
     const close = scene.add.rectangle(480, 462, 190, 40, CYBER.magenta).setStrokeStyle(1, CYBER.cyan, 0.7).setInteractive({ useHandCursor: true })
     const closeText = scene.add.text(480, 462, 'ЗАКРЫТЬ', {
-      fontFamily: 'Montserrat', fontSize: '13px', fontStyle: 'bold', color: '#fff6e8',
+      fontFamily: BODY_FONT, fontSize: '13px', fontStyle: 'bold', color: '#fff6e8',
     }).setOrigin(0.5)
     close.on('pointerover', () => close.setFillStyle(CYBER.violet))
     close.on('pointerout', () => close.setFillStyle(CYBER.magenta))
@@ -59,10 +59,10 @@ export class AudioSettingsModal {
     const current = loadRenderQuality()
     const qualities: RenderQuality[] = ['performance', 'balanced', 'quality']
     const label = scene.add.text(315, 228, 'Качество изображения', {
-      fontFamily: 'Montserrat', fontSize: '12px', color: '#cfc1d2',
+      fontFamily: BODY_FONT, fontSize: '12px', color: '#cfc1d2',
     }).setOrigin(0, 0.5)
     const status = scene.add.text(480, 302, '', {
-      fontFamily: 'Montserrat', fontSize: '10px', color: '#f3c96b',
+      fontFamily: BODY_FONT, fontSize: '10px', color: '#f3c96b',
     }).setOrigin(0.5)
     const entries: Array<{ quality: RenderQuality; button: Phaser.GameObjects.Rectangle; text: Phaser.GameObjects.Text }> = []
     this.root.add([label, status])
@@ -73,7 +73,7 @@ export class AudioSettingsModal {
         .setStrokeStyle(1, active ? CYBER.white : CYBER.cyan, active ? 0.8 : 0.35)
         .setInteractive({ useHandCursor: true })
       const text = scene.add.text(x, 264, RENDER_QUALITY_LABELS[quality], {
-        fontFamily: 'Montserrat', fontSize: '9px', fontStyle: 'bold', color: active ? '#071018' : '#eafcff',
+        fontFamily: BODY_FONT, fontSize: '9px', fontStyle: 'bold', color: active ? '#071018' : '#eafcff',
       }).setOrigin(0.5)
       button.on('pointerdown', () => {
         audioManager.notify('button')
@@ -97,10 +97,10 @@ export class AudioSettingsModal {
     const background = scene.add.rectangle(x, y, 330, 42, CYBER.panelSoft).setStrokeStyle(1, CYBER.cyan, 0.3)
       .setInteractive({ useHandCursor: true })
     const labelText = scene.add.text(x - 145, y, label, {
-      fontFamily: 'Montserrat', fontSize: '14px', fontStyle: 'bold', color: '#eee2ed',
+      fontFamily: BODY_FONT, fontSize: '14px', fontStyle: 'bold', color: '#eee2ed',
     }).setOrigin(0, 0.5)
     const valueText = scene.add.text(x + 142, y, enabled ? 'ВКЛ.' : 'ВЫКЛ.', {
-      fontFamily: 'Montserrat', fontSize: '12px', fontStyle: 'bold', color: '#77e0a0',
+      fontFamily: BODY_FONT, fontSize: '12px', fontStyle: 'bold', color: '#77e0a0',
     }).setOrigin(1, 0.5)
     background.on('pointerdown', () => {
       audioManager.notify('button')
@@ -114,7 +114,7 @@ export class AudioSettingsModal {
     scene: Phaser.Scene, x: number, y: number, label: string, value: number, onChange: (value: number) => void,
   ): Phaser.GameObjects.Rectangle {
     const labelText = scene.add.text(x - 165, y - 20, label, {
-      fontFamily: 'Montserrat', fontSize: '12px', color: '#cfc1d2',
+      fontFamily: BODY_FONT, fontSize: '12px', color: '#cfc1d2',
     }).setOrigin(0, 0.5)
     const track = scene.add.rectangle(x, y + 7, 330, 12, CYBER.panelBright).setInteractive({ useHandCursor: true })
     const fill = scene.add.rectangle(x - 165, y + 7, 330 * value, 12, CYBER.cyan).setOrigin(0, 0.5)

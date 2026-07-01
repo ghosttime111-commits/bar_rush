@@ -2,7 +2,7 @@ import Phaser from 'phaser'
 import type { Recipe } from '../game/recipes'
 import { createIngredientSequence } from './IngredientIcon'
 import { preparationIcon, preparationLabel } from '../game/preparationMethods'
-import { BODY_FONT, CYBER, CYBER_FONT, hex } from './cyberTheme'
+import { BODY_FONT, CYBER, CYBER_FONT, hex, UI_RADIUS, UI_STROKE } from './cyberTheme'
 import { createCocktailIcon } from './CocktailIcon'
 
 export class RecipeCard {
@@ -12,9 +12,9 @@ export class RecipeCard {
     this.root = scene.add.container(x, y)
     const graphics = scene.add.graphics()
     graphics.fillStyle(unlocked ? CYBER.panel : 0x0b0c1a, unlocked ? 0.76 : 0.8)
-    graphics.fillRoundedRect(-207, -72, 414, 144, 5)
-    graphics.lineStyle(2, unlocked ? CYBER.cyan : CYBER.muted, unlocked ? 0.62 : 0.32)
-    graphics.strokeRoundedRect(-207, -72, 414, 144, 5)
+    graphics.fillRoundedRect(-207, -72, 414, 144, UI_RADIUS.normal)
+    graphics.lineStyle(1.5, unlocked ? CYBER.cyan : CYBER.muted, unlocked ? UI_STROKE.normal : UI_STROKE.subtle)
+    graphics.strokeRoundedRect(-207, -72, 414, 144, UI_RADIUS.normal)
     graphics.fillStyle(unlocked ? CYBER.magenta : CYBER.muted, 0.65).fillRect(-207, -58, 3, 116)
     const shadow = scene.add.rectangle(0, 5, 414, 144, 0x01020a, 0.5).setOrigin(0.5)
     this.root.add([shadow, graphics])

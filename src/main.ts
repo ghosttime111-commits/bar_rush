@@ -6,8 +6,10 @@ import { UpgradeScene } from './scenes/UpgradeScene'
 import { RecipeBookScene } from './scenes/RecipeBookScene'
 import { audioManager } from './audio/AudioManager'
 import { initialRenderSize, renderSizeForViewport } from './ui/RenderQualityManager'
+import { loadUiFonts } from './ui/typography'
 
 audioManager.initialize()
+await loadUiFonts()
 const renderSize = initialRenderSize()
 
 const game = new Phaser.Game({

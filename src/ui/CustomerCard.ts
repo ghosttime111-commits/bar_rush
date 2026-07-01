@@ -4,7 +4,7 @@ import type { Recipe } from '../game/recipes'
 import type { CustomerArchetype, CustomerSpriteDefinition } from '../game/customerSprites'
 import { responsiveFont } from './responsive'
 import { audioManager } from '../audio/AudioManager'
-import { BODY_FONT, CYBER, CYBER_FONT, hex } from './cyberTheme'
+import { BODY_FONT, CYBER, CYBER_FONT, hex, UI_STROKE } from './cyberTheme'
 import { createCocktailIcon } from './CocktailIcon'
 
 export class CustomerCard {
@@ -21,6 +21,7 @@ export class CustomerCard {
   private typeText: Phaser.GameObjects.Text
   private patienceBar: Phaser.GameObjects.Rectangle
   private patienceGlow: Phaser.GameObjects.Rectangle
+  private patienceWarning: Phaser.GameObjects.Rectangle
   private spriteKey: string
   private look: CustomerArchetype
   private spriteDisplay: Pick<CustomerSpriteDefinition, 'scaleMultiplier' | 'offsetX' | 'offsetY'>
@@ -71,17 +72,24 @@ export class CustomerCard {
       fontFamily: CYBER_FONT, fontSize: responsiveFont(10, 1.06), fontStyle: 'bold', color: hex(CYBER.white),
     }).setOrigin(0.5)
 
-    const patienceBg = scene.add.rectangle(0, 111, 174, 12, 0x252943).setOrigin(0.5)
-    this.patienceGlow = scene.add.rectangle(-87, 111, 174, 12, CYBER.danger, 0)
+    const patienceBg = scene.add.rectangle(0, 111, 184, 16, 0x060817, 0.94)
+      .setStrokeStyle(1, CYBER.cyanSoft, UI_STROKE.normal)
+    const patienceTrack = scene.add.rectangle(0, 111, 176, 10, CYBER.panelBright, 0.95)
+    this.patienceGlow = scene.add.rectangle(-88, 111, 176, 10, CYBER.danger, 0)
       .setOrigin(0, 0.5)
-    this.patienceBar = scene.add.rectangle(-87, 111, 174, 12, CYBER.success)
+    this.patienceBar = scene.add.rectangle(-88, 111, 176, 10, CYBER.success)
       .setOrigin(0, 0.5)
+    const patienceTicks = scene.add.graphics()
+    patienceTicks.lineStyle(1, CYBER.void, 0.72)
+    for (const x of [-44, 0, 44]) patienceTicks.lineBetween(x, 107, x, 115)
+    this.patienceWarning = scene.add.rectangle(0, 111, 190, 22, CYBER.danger, 0)
+      .setStrokeStyle(2, CYBER.danger, 0)
 
     this.root.add([
       this.selectionLight, shadow, this.glow, this.frame, this.successFlash,
       this.avatarFallback, this.avatarImage, typePlate, this.typeText,
       orderShadow, orderPanel, orderIconPlate, this.orderName,
-      patienceBg, this.patienceGlow, this.patienceBar,
+      patienceBg, patienceTrack, this.patienceGlow, this.patienceBar, patienceTicks, this.patienceWarning,
     ])
     this.drawFallbackAvatar(false)
     this.syncAvatarVisibility()
@@ -152,20 +160,33 @@ export class CustomerCard {
   setPatience(ratio: number): void {
     if (!this.isUsable()) return
     this.patienceBar.setScale(ratio, 1)
-    this.patienceBar.setFillStyle(patienceColor(ratio))
+    const color = patienceColor(ratio)
+    this.patienceBar.setFillStyle(color)
+    this.patienceGlow.setFillStyle(color)
     const nowLow = ratio <= 0.25
     if (nowLow !== this.lowPatience) {
       this.lowPatience = nowLow
-      this.scene.tweens.killTweensOf([this.patienceBar, this.patienceGlow])
+      this.scene.tweens.killTweensOf([this.patienceBar, this.patienceGlow, this.patienceWarning])
       this.patienceGlow.setAlpha(0)
+      this.patienceWarning.setAlpha(0).setStrokeStyle(2, CYBER.danger, 0)
       this.patienceBar.setAlpha(1)
       if (nowLow) {
+        this.patienceWarning.setStrokeStyle(2, CYBER.danger, 0.86)
         this.scene.tweens.add({
-          targets: [this.patienceBar, this.patienceGlow],
-          alpha: { from: 1, to: 0.28 },
-          duration: 260,
+          targets: this.patienceBar,
+          alpha: { from: 1, to: 0.58 },
+          duration: 320,
           yoyo: true,
           repeat: -1,
+          ease: 'Sine.easeInOut',
+        })
+        this.scene.tweens.add({
+          targets: [this.patienceGlow, this.patienceWarning],
+          alpha: { from: 0.68, to: 0.12 },
+          duration: 320,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
         })
       }
     }
@@ -326,8 +347,8 @@ export class CustomerCard {
 }
 
 function patienceColor(ratio: number): number {
-  if (ratio >= 0.5) return mixColor(0xf0c14f, 0x67cf86, (ratio - 0.5) * 2)
-  return mixColor(0xef5967, 0xf0c14f, ratio * 2)
+  if (ratio >= 0.55) return mixColor(CYBER.amber, CYBER.success, (ratio - 0.55) / 0.45)
+  return mixColor(CYBER.danger, CYBER.amber, ratio / 0.55)
 }
 
 function mixColor(from: number, to: number, amount: number): number {

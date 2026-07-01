@@ -12,7 +12,7 @@ import { SHIFT_MODES, modeModifierLines } from '../game/shiftModes'
 import { SpecialShiftOfferModal } from '../ui/SpecialShiftOfferModal'
 import { createUpgradeIcon, preloadUpgradeIcons } from '../ui/UpgradeIcon'
 import type { ShiftModeId } from '../game/shiftModes'
-import { BODY_FONT, CYBER, CYBER_FONT } from '../ui/cyberTheme'
+import { BODY_FONT, CYBER, CYBER_FONT, DISPLAY_FONT } from '../ui/cyberTheme'
 import { installResponsiveLayout } from '../ui/LayoutManager'
 import { FullscreenControl } from '../ui/FullscreenControl'
 
@@ -43,9 +43,9 @@ export class UpgradeScene extends Phaser.Scene {
     this.add.rectangle(480, 270, 960, 540, CYBER.void, 0.18)
     this.add.rectangle(480, 37, 520, 48, CYBER.panel, 0.78).setStrokeStyle(1, CYBER.cyan, 0.7)
     this.add.rectangle(480, 60, 518, 2, CYBER.magenta, 0.72)
-    this.add.text(480, 35, 'BAR RUSH · УЛУЧШЕНИЯ', { fontFamily: 'Trebuchet MS', fontSize: '24px', fontStyle: 'bold', color: '#f3c96b' }).setOrigin(0.5)
-    this.balanceText = this.add.text(480, 68, '', { fontFamily: 'Trebuchet MS', fontSize: '16px', fontStyle: 'bold', color: '#fff' }).setOrigin(0.5)
-    this.statusText = this.add.text(480, 454, '', { fontFamily: 'Trebuchet MS', fontSize: '12px', fontStyle: 'bold', color: '#7ee5a2' }).setOrigin(0.5)
+    this.add.text(480, 35, 'BAR RUSH · УЛУЧШЕНИЯ', { fontFamily: DISPLAY_FONT, fontSize: '23px', color: '#f3c96b' }).setOrigin(0.5)
+    this.balanceText = this.add.text(480, 68, '', { fontFamily: BODY_FONT, fontSize: '16px', fontStyle: 'bold', color: '#fff' }).setOrigin(0.5)
+    this.statusText = this.add.text(480, 454, '', { fontFamily: BODY_FONT, fontSize: '12px', fontStyle: 'bold', color: '#7ee5a2' }).setOrigin(0.5)
     this.createFooterButtons()
     this.createAudioSettingsButton()
     new FullscreenControl(this, { x: 150, y: 456 })
@@ -69,7 +69,7 @@ export class UpgradeScene extends Phaser.Scene {
     })
     if (pageCount > 1) {
       const prev = this.pageButton(420, 448, '‹', -1, pageCount)
-      const count = this.add.text(480, 448, `${this.page + 1}/${pageCount}`, { fontFamily: 'Trebuchet MS', fontSize: '12px', color: '#d8cadb' }).setOrigin(0.5)
+      const count = this.add.text(480, 448, `${this.page + 1}/${pageCount}`, { fontFamily: BODY_FONT, fontSize: '12px', color: '#d8cadb' }).setOrigin(0.5)
       const next = this.pageButton(540, 448, '›', 1, pageCount)
       this.pageObjects.push(prev, count, next)
     }
@@ -81,13 +81,13 @@ export class UpgradeScene extends Phaser.Scene {
     const panel = this.add.rectangle(0, 0, 398, 138, CYBER.panel, 0.76).setStrokeStyle(1, CYBER.cyan, 0.68)
     const accent = this.add.rectangle(0, -67, 396, 3, CYBER.magenta, 0.8)
     const icon = createUpgradeIcon(this, upgrade, -172, -45, 30)
-    const name = this.add.text(-140, -50, upgrade.name, { fontFamily: 'Trebuchet MS', fontSize: '15px', fontStyle: 'bold', color: '#fff' }).setOrigin(0, 0.5)
-    const levelText = this.add.text(177, -50, '', { fontFamily: 'Trebuchet MS', fontSize: '11px', fontStyle: 'bold', color: '#f3c96b' }).setOrigin(1, 0.5)
+    const name = this.add.text(-140, -50, upgrade.name, { fontFamily: BODY_FONT, fontSize: '15px', fontStyle: 'bold', color: '#fff' }).setOrigin(0, 0.5)
+    const levelText = this.add.text(177, -50, '', { fontFamily: BODY_FONT, fontSize: '11px', fontStyle: 'bold', color: '#f3c96b' }).setOrigin(1, 0.5)
     const description = this.add.text(-178, -17, upgrade.description, { fontFamily: BODY_FONT, fontSize: '10px', color: '#a5c8d7', wordWrap: { width: 350 } }).setOrigin(0, 0.5)
-    const effectText = this.add.text(-178, 15, '', { fontFamily: 'Trebuchet MS', fontSize: '10px', color: '#8edfa9' }).setOrigin(0, 0.5)
-    const priceText = this.add.text(-178, 49, '', { fontFamily: 'Trebuchet MS', fontSize: '11px', fontStyle: 'bold', color: '#ddd1df' }).setOrigin(0, 0.5)
+    const effectText = this.add.text(-178, 15, '', { fontFamily: BODY_FONT, fontSize: '10px', color: '#8edfa9' }).setOrigin(0, 0.5)
+    const priceText = this.add.text(-178, 49, '', { fontFamily: BODY_FONT, fontSize: '11px', fontStyle: 'bold', color: '#ddd1df' }).setOrigin(0, 0.5)
     const button = this.add.rectangle(118, 47, 130, 34, CYBER.magenta).setStrokeStyle(1, CYBER.cyan, 0.8).setInteractive({ useHandCursor: true })
-    const buttonText = this.add.text(118, 47, 'КУПИТЬ', { fontFamily: 'Trebuchet MS', fontSize: '11px', fontStyle: 'bold', color: '#171019' }).setOrigin(0.5)
+    const buttonText = this.add.text(118, 47, 'КУПИТЬ', { fontFamily: BODY_FONT, fontSize: '11px', fontStyle: 'bold', color: '#171019' }).setOrigin(0.5)
     button.on('pointerdown', () => this.purchase(upgrade))
     root.add([panel, accent, icon, name, levelText, description, effectText, priceText, button, buttonText])
     this.cards.set(upgrade.id, { root, priceText, levelText, effectText, button, buttonText })
@@ -130,13 +130,13 @@ export class UpgradeScene extends Phaser.Scene {
     const mode = SHIFT_MODES[modeId]
     const panel = this.add.rectangle(150, 52, 260, 42, CYBER.panel, 0.76).setStrokeStyle(1, mode.accentColor, 0.85).setDepth(3)
     const title = this.add.text(32, 45, `${mode.icon}  ${mode.name}`, {
-      fontFamily: 'Trebuchet MS', fontSize: '9px', fontStyle: 'bold', color: '#fff',
+      fontFamily: BODY_FONT, fontSize: '9px', fontStyle: 'bold', color: '#fff',
     }).setOrigin(0, 0.5).setDepth(4)
     const details = this.add.text(32, 61, modeModifierLines(mode).slice(0, 2).join('  •  '), {
-      fontFamily: 'Trebuchet MS', fontSize: '7px', color: '#d8cadb',
+      fontFamily: BODY_FONT, fontSize: '7px', color: '#d8cadb',
     }).setOrigin(0, 0.5).setDepth(4)
     const start = this.add.rectangle(248, 52, 56, 28, mode.accentColor).setInteractive({ useHandCursor: true }).setDepth(4)
-    const startText = this.add.text(248, 52, 'ОТКРЫТЬ', { fontFamily: 'Trebuchet MS', fontSize: '7px', fontStyle: 'bold', color: '#171019' }).setOrigin(0.5).setDepth(5)
+    const startText = this.add.text(248, 52, 'ОТКРЫТЬ', { fontFamily: BODY_FONT, fontSize: '7px', fontStyle: 'bold', color: '#171019' }).setOrigin(0.5).setDepth(5)
     start.on('pointerdown', () => {
       if (this.transitionInProgress) return
       new SpecialShiftOfferModal(this, modeId, this.progress, () => undefined, () => this.startShift(modeId))
@@ -153,7 +153,7 @@ export class UpgradeScene extends Phaser.Scene {
   private button(x: number, y: number, width: number, height: number, color: number, label: string, action: () => void): void {
     const background = this.add.rectangle(x, y, width, height, color).setInteractive({ useHandCursor: true })
     background.setStrokeStyle(1, color === 0xc0434b ? CYBER.magenta : CYBER.cyan, 0.65)
-    this.add.text(x, y, label, { fontFamily: 'Trebuchet MS', fontSize: '12px', fontStyle: 'bold', color: '#fff' }).setOrigin(0.5)
+    this.add.text(x, y, label, { fontFamily: BODY_FONT, fontSize: '12px', fontStyle: 'bold', color: '#fff' }).setOrigin(0.5)
     background.on('pointerdown', action)
   }
 
